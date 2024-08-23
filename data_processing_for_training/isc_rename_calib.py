@@ -42,7 +42,7 @@ def clear_directory(directory):
 if __name__ == "__main__":
     input_file_train = '/home/gene/mmdetection3d/data/isc_full/ImageSets/trainval.txt'
     input_file_test = '/home/gene/mmdetection3d/data/isc_full/ImageSets/test.txt'
-    original_file = '/home/gene/Documents/000000.txt'  # Original file name
+    original_file = '000000.txt'  # Original file name
     output_directory1 = '/home/gene/mmdetection3d/data/isc_full/training/calib/'   # Output directory
     output_directory2 = '/home/gene/mmdetection3d/data/isc_full/testing/calib/'   # Output directory
     
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     print(f"File copied successfully: {copied_file}")
 
-    origin_image = '/home/gene/Documents/000000.png'
+    origin_image = '000000.png'
     output_image1 = '/home/gene/mmdetection3d/data/isc_full/training/image_2/'
     output_image2 = '/home/gene/mmdetection3d/data/isc_full/testing/image_2/'
     copied_file = copy_and_rename_file(input_file_train, origin_image, output_image1)
