@@ -4,6 +4,8 @@ Edit each path in the file as your own data location and mmdetection3d data loca
 data_processing_for_training/isc2kitti.py
 Edit the coordinate tranformation if you want to get 3d labels in image and train the camera-based detector.
 If you do not run the code in mmdetection3d, you need to add the code of coordinate transformation from lidar to camera.
+  - box_3d_mode.py
+    - This is for you to understand the tranformation logic, not for running.
 
 #### 2. remove data to isc_full
 data_processing_for_training/isc_rename_bin_moveto_isc_dataset.py
