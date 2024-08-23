@@ -5,21 +5,21 @@ def split_text_file(input_file, output_file1, output_file2, split_ratio=0.8):
     with open(input_file, 'r') as f:
         lines = f.readlines()
 
-    # 计算拆分的位置
+    # Calculate the split index
     split_index = int(len(lines) * split_ratio)
 
-    # 随机打乱列表
+    # Shuffle the list randomly
     random.shuffle(lines)
 
-    # 分割成两部分
+    # Split into two parts
     part1 = lines[:split_index]
     part2 = lines[split_index:]
 
-    # 写入第一个输出文件
+    # Write to the first output file
     with open(output_file1, 'w') as f1:
         f1.writelines(part1)
 
-    # 写入第二个输出文件
+    # Write to the second output file
     with open(output_file2, 'w') as f2:
         f2.writelines(part2)
 
@@ -29,26 +29,26 @@ def list_files_to_txt(folder_path, output_file):
         for filename in os.listdir(folder_path):
             file_path = os.path.join(folder_path, filename)
             if os.path.isfile(file_path):
-                f.write(filename[:-4]+'\n')
+                f.write(filename[:-4] + '\n')
 
-# 文件夹路径
+# Folder paths
 folder_path_train = '/home/gene/mmdetection3d/data/isc_full/training/velodyne/'
 folder_path_test = '/home/gene/mmdetection3d/data/isc_full/testing/velodyne/'
-# 输出文件路径
+# Output file paths
 output_file_train = '/home/gene/mmdetection3d/data/isc_full/ImageSets/trainval.txt'
 output_file_test = '/home/gene/mmdetection3d/data/isc_full/ImageSets/test.txt'
 
-# 调用函数，将文件夹下文件名写入文本文件
+# Call the function to write filenames from the folder to text files
 list_files_to_txt(folder_path_train, output_file_train)
 list_files_to_txt(folder_path_test, output_file_test)
 
-print(f"已将文件夹 {folder_path_test} 下的文件列表写入到 {output_file_test}")
+print(f"File list from folder {folder_path_test} has been written to {output_file_test}")
 
-# 输入文件和输出文件路径
+# Input file and output file paths
 input_file = '/home/gene/mmdetection3d/data/isc_full/ImageSets/trainval.txt'
 output_file1 = '/home/gene/mmdetection3d/data/isc_full/ImageSets/train.txt'
 output_file2 = '/home/gene/mmdetection3d/data/isc_full/ImageSets/val.txt'
-# 调用函数，将输入文件内容随机拆分为两个输出文件
+# Call the function to randomly split the content of the input file into two output files
 split_text_file(input_file, output_file1, output_file2)
 
-print(f"已将文件 {input_file} 中的内容随机拆分并保存到 {output_file1} 和 {output_file2}")
+print(f"Content of file {input_file} has been randomly split and saved to {output_file1} and {output_file2}")
