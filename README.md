@@ -15,10 +15,13 @@ The two following both use the cut pcd range and merged point cloud with lidar1 
 The conventional one utilized background filtering (Difference Comparison), clustering (DBSCAN), classification (Random Forest) and bbox generation to get the detections.
 ##### Step:
 Under conventional_methods folder, find `main.py`.
+
 ```Command: python main.py <path>```
+
 Note: Please provide the folder location of testing data with '\\' before blank and '/' in the end.
 ##### Results:
 `Run_\*/detections/Run_\*_detections_axis_aligned_lidar2.txt`
+
 `Run_\*/detections/Run_\*_detections_oriented_lidar2.txt`
 
 #### Deep Learning Pipeline
