@@ -20,9 +20,9 @@ Under conventional_methods folder, find `main.py`.
 
 Note: Please provide the folder location of testing data with '\\' before blank and '/' in the end.
 ##### Results:
-`Run_\*/detections/Run_\*_detections_axis_aligned_lidar2.txt`
+`Run_*/detections/Run_*_detections_axis_aligned_lidar2.txt`
 
-`Run_\*/detections/Run_\*_detections_oriented_lidar2.txt`
+`Run_*/detections/Run_*_detections_oriented_lidar2.txt`
 
 #### Deep Learning Pipeline
 The deep learning pipeline is developed under MMDetection3D framework and Kitti format, using pointpillars detector. To run this pipeline, please first install the MMDetection3D environment with correponding version packages. 
