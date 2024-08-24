@@ -8,7 +8,8 @@
 │   ├── isc2kitti.py
 │   ├── label_features_12_all.npy
 │   ├── main.py
-│   └── merge_lidar1lidar2_cloud.py
+│   ├── merge_lidar1lidar2_cloud.py
+│   └── sample_detections (generated from validation data)
 ├── deep_learning_pipeline
 │   └── data_processing_for_training
 │       ├── 000000.png
@@ -48,10 +49,10 @@ Under conventional_pipeline folder, find `main.py`.
 
 Note: Please provide the folder location of testing data with '\\' before blank and '/' in the end.
 
-1. Get the classifier: 
+1. Get the classifier (Validation/Training Data with labels): 
 ```isc2kitti->cut_pcd_range->merge_lidar1_and_lidar2->filter_background->get_training_feature_and_label```
 We have gathered the `label_feature_12_all.npy` here, so you do not need to process step by step.
-2. Test the data, get the detections:
+2. Test the data, get the detections (Testing Data without labels):
 If you do not have the Lidar12_pcd_filtered, you need to process the Lidar1_pcd and Lidar2_pcd with `cut_pcd_range->merge_lidar1_and_lidar2->filter_background->clustering_classification_bbox_generation`.
 
 ##### Results:
