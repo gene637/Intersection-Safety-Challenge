@@ -56,6 +56,8 @@ We have gathered the `label_feature_12_all.npy` here, so you do not need to proc
 If you do not have the Lidar12_pcd_filtered, you need to process the Lidar1_pcd and Lidar2_pcd with `cut_pcd_range->merge_lidar1_and_lidar2->filter_background->clustering_classification_bbox_generation`.
 
 ##### Results:
+Detection format (in lidar2 coordinate): frame, subclass, x_center, x_length, y_center, y_length, z_center, z_length, yaw, score
+
 `Run_*/detections/Run_*_detections_axis_aligned_lidar2.txt`
 
 `Run_*/detections/Run_*_detections_oriented_lidar2.txt`

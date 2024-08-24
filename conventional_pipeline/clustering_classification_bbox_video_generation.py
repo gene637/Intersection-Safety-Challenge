@@ -37,23 +37,23 @@ def draw_principal_directions(bev_image, center, eigenvectors, scale=50, color=(
     cv2.arrowedLine(bev_image, center, end_point, color, thickness)
 
 def scale_change(x, y, resolution=(460, 525)):
-    # 确定 BEV 图像范围
+    # Define BEV (Bird's Eye View) image range
     x_min, x_max = -30, 62
     y_min, y_max = -50, 55
     x_range = x_max - x_min
     y_range = y_max - y_min
 
-    # 归一化
+    # Normalize
     x_normalized = (x - x_min) / x_range * (resolution[0]-1)
     y_normalized = (y - y_min) / y_range * (resolution[1]-1)
     # Reverse the y-axis (flip vertically)
     y_normalized = resolution[1] - 1 - y_normalized
 
-    # 确保归一化结果在有效范围内
+    # Ensure normalized results are within valid range
     x_normalized = np.clip(x_normalized, 0, resolution[0]-1)
     y_normalized = np.clip(y_normalized, 0, resolution[1]-1)
 
-    # 将归一化值转换为整数
+    # Convert normalized values to integers
     px, py = np.round(x_normalized).astype(int), np.round(y_normalized).astype(int)
 
     return px, py
@@ -61,33 +61,33 @@ def scale_change(x, y, resolution=(460, 525)):
 def point_cloud_to_bev(points, resolution=(460, 525)):
     """ Convert point cloud to BEV image """
     
-    # 创建 BEV 图像
-    bev_image = 255*np.ones((resolution[1], resolution[0], 3), dtype=np.uint8)
+    # Create BEV image
+    bev_image = 255 * np.ones((resolution[1], resolution[0], 3), dtype=np.uint8)
 
-    # BEV视角下的投影
-    # 假设 BEV 视角下的 x 和 y 坐标映射到图像的宽和高
-    x, y = points[:, 0], points[:, 1] 
-    # 确定 BEV 图像范围
+    # Projection in BEV view
+    # Assume BEV view's x and y coordinates map to the image's width and height
+    x, y = points[:, 0], points[:, 1]
+    # Define BEV image range
     x_min, x_max = -30, 62
     y_min, y_max = -50, 55
     x_range = x_max - x_min
     y_range = y_max - y_min
 
-    # 归一化
+    # Normalize
     x_normalized = (x - x_min) / x_range * (resolution[0]-1)
     y_normalized = (y - y_min) / y_range * (resolution[1]-1)
     # Reverse the y-axis (flip vertically)
     y_normalized = resolution[1] - 1 - y_normalized
 
-    # 确保归一化结果在有效范围内
+    # Ensure normalized results are within valid range
     x_normalized = np.clip(x_normalized, 0, resolution[0]-1)
     y_normalized = np.clip(y_normalized, 0, resolution[1]-1)
 
-    # 将归一化值转换为整数
+    # Convert normalized values to integers
     px, py = np.round(x_normalized).astype(int), np.round(y_normalized).astype(int)
-    # 将点云绘制到 BEV 图像上
+    # Plot point cloud onto BEV image
     for i in range(len(points)):
-        bev_image[py[i], px[i]] = (0, 0, 0)  # 白色点
+        bev_image[py[i], px[i]] = (0, 0, 0)  # Black points
     
     return bev_image
 
@@ -116,9 +116,9 @@ def calculate_features(bbox):
                                      [1,0,0]])
 
     #feature extraction
-    min_bound = bbox.min_bound  # 边界框的最小点坐标 (x_min, y_min, z_min)
-    max_bound = bbox.max_bound  # 边界框的最大点坐标 (x_max, y_max, z_max)
-    size = max_bound - min_bound  # 边界框的尺寸 (width, height, depth)
+    min_bound = bbox.min_bound  # (x_min, y_min, z_min)
+    max_bound = bbox.max_bound  # (x_max, y_max, z_max)
+    size = max_bound - min_bound  # (width, height, depth)
     bbox_2d = [
         (scale_change(min_bound[0], min_bound[1])),
         (scale_change(max_bound[0], min_bound[1])),
