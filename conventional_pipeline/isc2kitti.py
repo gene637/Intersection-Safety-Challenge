@@ -18,7 +18,7 @@ def main(loc):
     for sub_dir in sub_dirs:
         path = loc+'/'+sub_dir+'/'
         if not os.path.exists(path+'Kitti_GT'):
-            os.mkdir(path+'Kitti_GT')
+            os.makedirs(path+'Kitti_GT')
         bbxs_header = np.genfromtxt(path+sub_dir+'_GT.csv', delimiter=',', dtype='|U')
         bbxs_org = np.genfromtxt(path+sub_dir+'_GT.csv', delimiter=',', skip_header=1, skip_footer=1)
         bbxs = bbxs_org[:,1:]

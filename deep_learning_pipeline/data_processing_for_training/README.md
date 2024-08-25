@@ -1,4 +1,4 @@
-Edit each path in the file as your own data location and mmdetection3d data location
+Functions:
 
 #### 1. isc2kitti
 data_processing_for_training/isc2kitti.py
@@ -9,15 +9,15 @@ If you do not run the code in mmdetection3d, you need to add the code of coordin
 
 #### 2. remove data to isc_full
 data_processing_for_training/isc_rename_bin_moveto_isc_dataset.py
-Edit line 25 and 92 (train/test)
+
+Please provide the ISC loc and MMdet3d target location.
+If you are planning to generate training data, set test=0; testing data, set test=1.
 
 #### 3. generate imagesets (split train and val randomly)
 data_processing_for_training/isc_imagesets_generation.py
-No Edit.
 
 #### 4. rename calib files according to imagesets
 data_processing_for_training/isc_rename_calib.py
-No Edit.
 
 #### 5. generate kitti pickles (under mmdetection3d)
 python tools/create_data.py kitti --root-path ./data/isc_full --out-dir ./data/isc_full --extra-tag isc_full_lidar12

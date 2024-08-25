@@ -38,7 +38,6 @@ def main():
     # cluster paras: eps, min_points
     # returned detections for tracking
     bounding_boxes_axis_aligned_lidar2_allrun, bounding_boxes_oriented_lidar2_allrun = clustering_classification_bbox_video_generation(loc, eps = 0.7, min_points = 4, video = False)
-    print(bounding_boxes_axis_aligned_lidar2_allrun)
 
 
 

@@ -70,3 +70,14 @@ Note: you can finetune the filtering degree with scale, nb_points and radius; fi
 The deep learning pipeline is developed under MMDetection3D framework and Kitti format, using pointpillars detector. To run this pipeline, please first install the MMDetection3D environment with correponding version packages.
 ##### Step:
 Under deep_learning_pipeline folder, use code under data_processing_for_training to process the ISC data to Kitti format.
+Under data_processing_for_training folder, find `main.py`.
+
+```Command: python main.py <src_path> <target_path>```
+
+Note: Please provide the folder location of source testing data and target testing data with '\\' before blank and '/' in the end.
+I.e., `/home/gene/Documents/Validation\\ Data2/ /home/gene/mmdetection3d/data/isc_full/`
+
+Steps:
+```generate kitti label->cut pcd range->merge lidar1 and lidar2->pcd2bin for training in Kitti format->remove data to isc_full->generate imagesets (split train and val randomly)->rename calib files according to imagesets```
+
+After generating the files for training in MMDet3D, please refer to command in README.md under data_processing_for_training to train the model.

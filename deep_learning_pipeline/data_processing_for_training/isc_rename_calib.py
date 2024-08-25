@@ -36,15 +36,12 @@ def clear_directory(directory):
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
 
-
-
-# Example usage
-if __name__ == "__main__":
-    input_file_train = '/home/gene/mmdetection3d/data/isc_full/ImageSets/trainval.txt'
-    input_file_test = '/home/gene/mmdetection3d/data/isc_full/ImageSets/test.txt'
+def main(target):
+    input_file_train = target + 'ImageSets/trainval.txt'
+    input_file_test = target + 'ImageSets/test.txt'
     original_file = '000000.txt'  # Original file name
-    output_directory1 = '/home/gene/mmdetection3d/data/isc_full/training/calib/'   # Output directory
-    output_directory2 = '/home/gene/mmdetection3d/data/isc_full/testing/calib/'   # Output directory
+    output_directory1 = target + 'training/calib/'   # Output directory
+    output_directory2 = target + 'testing/calib/'   # Output directory
     
     copied_file = copy_and_rename_file(input_file_train, original_file, output_directory1)
     copied_file = copy_and_rename_file(input_file_test, original_file, output_directory2)
@@ -52,9 +49,15 @@ if __name__ == "__main__":
     print(f"File copied successfully: {copied_file}")
 
     origin_image = '000000.png'
-    output_image1 = '/home/gene/mmdetection3d/data/isc_full/training/image_2/'
-    output_image2 = '/home/gene/mmdetection3d/data/isc_full/testing/image_2/'
+    output_image1 = target + 'training/image_2/'
+    output_image2 = target + 'testing/image_2/'
+
     copied_file = copy_and_rename_file(input_file_train, origin_image, output_image1)
     copied_file = copy_and_rename_file(input_file_test, origin_image, output_image2)
 
     print(f"File copied successfully: {copied_file}")
+
+# Example usage
+if __name__ == "__main__":
+    target = '/home/gene/mmdetection3d/data/isc_full/'
+    main(target)
