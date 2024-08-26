@@ -81,7 +81,7 @@ The deep learning pipeline is developed under MMDetection3D framework and Kitti 
 
 ###### Data processing for training
 Under deep_learning_pipeline folder, use code under data_processing_for_training to process the ISC data to Kitti format.
-Under data_processing_for_training folder, find `main.py`.
+Under data_processing_for_training folder, find `main.py`. If you just want to train the evaluate the model with ISC data, please run the script in one step. If you plan to test unlabeled data, which is to say 'Training Data' in ISC, please process the data with instructions in main.py.
 
 ```Command: python main.py <src_path> <target_path>```
 
