@@ -36,7 +36,7 @@ def main():
     # Please provide the ISC loc and MMdet3d target location
     # If you are planning to generate training data, set test=0; testing data, set test=1
     isc_rename_bin_moveto_isc_dataset(loc, target, test=0)
-    isc_rename_bin_moveto_isc_dataset(loc, target, test=1)
+    isc_rename_bin_moveto_isc_dataset(loc, target, test=1) # if you just want to train and validate the data, please just uncomment this line and run this script in one step； if you are processing testing data, please first unwrap the pcap under Training Data (without labels), then run cut_pcd_range->merge_lidar1lidar2_cloud->pcd2bin->isc_rename_bin_moveto_isc_dataset->isc_imagesets_generation->isc_rename_calib and annotate isc2kitti; if you meet 'UnboundLocalError: local variable 'ignore_class_name' referenced before assignment', please make sure both training and testing folder under isc_full is filled with data.
 
     # generate imagesets (split train and val randomly), train/test split ratio 0.8/0.2
     isc_imagesets_generation(target, split_ratio=0.8)
