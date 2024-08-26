@@ -35,6 +35,7 @@ def main():
     # remove data to isc_full
     # Please provide the ISC loc and MMdet3d target location
     # If you are planning to generate training data, set test=0; testing data, set test=1
+    isc_rename_bin_moveto_isc_dataset(loc, target, test=0)
     isc_rename_bin_moveto_isc_dataset(loc, target, test=1)
 
     # generate imagesets (split train and val randomly), train/test split ratio 0.8/0.2

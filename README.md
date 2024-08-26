@@ -11,16 +11,21 @@
 │   ├── merge_lidar1lidar2_cloud.py
 │   └── sample_detections (generated from validation data)
 ├── deep_learning_pipeline
-│   └── data_processing_for_training
-│       ├── 000000.png
-│       ├── 000000.txt
-│       ├── box_3d_mode.py
-│       ├── isc2kitti.py
-│       ├── isc_imagesets_generation.py
-│       ├── isc_rename_bin_moveto_isc_dataset.py
-│       ├── isc_rename_calib.py
-│       ├── isc_video_clipping.py
-│       └── README.md
+│   ├── data_processing_for_training
+│   │   ├── 000000.png
+│   │   ├── 000000.txt
+│   │   ├── box_3d_mode.py
+│   │   ├── isc2kitti.py
+│   │   ├── isc_imagesets_generation.py
+│   │   ├── isc_rename_bin_moveto_isc_dataset.py
+│   │   ├── isc_rename_calib.py
+│   │   ├── isc_video_clipping.py
+│   │   └── README.md
+│   ├── configs
+│   ├── data
+│   ├── mmdet3d
+│   ├── tools
+│   └── work_dirs (ckeckpoints)
 ├── environment.yml
 ├── LICENSE
 ├── README.md
@@ -42,7 +47,7 @@ The two following both use the cut pcd range and merged point cloud with lidar1 
 
 #### Conventional Pipeline
 The conventional one utilized background filtering (Difference Comparison), clustering (DBSCAN), classification (Random Forest) and bbox generation to get the detections.
-##### Step:
+##### Steps:
 Under conventional_pipeline folder, find `main.py`.
 
 ```Command: python main.py <path>```
@@ -68,7 +73,9 @@ Note: you can finetune the filtering degree with scale, nb_points and radius; fi
 
 #### Deep Learning Pipeline
 The deep learning pipeline is developed under MMDetection3D framework and Kitti format, using pointpillars detector. To run this pipeline, please first install the MMDetection3D environment with correponding version packages.
-##### Step:
+##### Steps:
+
+###### Data processing for training
 Under deep_learning_pipeline folder, use code under data_processing_for_training to process the ISC data to Kitti format.
 Under data_processing_for_training folder, find `main.py`.
 
@@ -80,4 +87,22 @@ I.e., `/home/gene/Documents/Validation\\ Data2/ /home/gene/mmdetection3d/data/is
 Steps:
 ```generate kitti label->cut pcd range->merge lidar1 and lidar2->pcd2bin for training in Kitti format->remove data to isc_full->generate imagesets (split train and val randomly)->rename calib files according to imagesets```
 
+###### Training in MMDet3D
+
 After generating the files for training in MMDet3D, please refer to command in README.md under data_processing_for_training to train the model.
+
+Steps:
+1. Create Data in Kitti format (under deep_learning_pipeline folder)
+```python tools/create_data.py kitti --root-path ./data/isc_full --out-dir ./data/isc_full --extra-tag isc_full```
+
+2. Train model (taking pointpillars as an example)
+```python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py --work-dir work_dirs/xxx --auto-scale-lr```
+
+If you would like to train other models, please edit the class_name and other class-related infos in the config file, refering to the configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py.
+
+For evaluation, please utilize 'kittiMetric' type in val_evaluator.
+
+3. Test model
+```python tools/test.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py work_dirs/lidar12/epoch_20_35mAP.pth --work-dir work_dirs/xxx```
+
+epoch_20_35mAP.pth could be used for testing, coco mAP40 and AP11/40(IoU:0.5/0.25) are utilized. 

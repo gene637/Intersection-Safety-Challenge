@@ -20,7 +20,7 @@ data_processing_for_training/isc_imagesets_generation.py
 data_processing_for_training/isc_rename_calib.py
 
 #### 5. generate kitti pickles (under mmdetection3d)
-python tools/create_data.py kitti --root-path ./data/isc_full --out-dir ./data/isc_full --extra-tag isc_full_lidar12
+python tools/create_data.py kitti --root-path ./data/isc_full --out-dir ./data/isc_full --extra-tag isc_full
 
 #### 6. train (under mmdetection3d)
 python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py --work-dir work_dirs/xxx
@@ -29,4 +29,4 @@ python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-
 python tools/test.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py work_dirs/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class/latest.pth --work-dir work_dirs/xxx
 
 #### 8. continue training from last pth (under mmdetection3d)
-python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py --work-dir work_dirs/lidar12 --resume work_dirs/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class/epoch_100_lidar12.pth
+python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py --work-dir work_dirs/lidar12 --resume work_dirs/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class/latest.pth
