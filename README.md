@@ -60,9 +60,12 @@ Note: Please provide the folder location of testing data with '\\' before blank 
 
 1. Get the classifier (Validation/Training Data with labels): 
 ```isc2kitti->cut_pcd_range->merge_lidar1_and_lidar2->filter_background->get_training_feature_and_label```
-We have gathered the `label_feature_12_all.npy` here, so you do not need to process step by step.
+
+    We have gathered the `label_feature_12_all.npy` here, so you do not need to process step by step.
+
 2. Test the data, get the detections (Testing Data without labels):
-If you do not have the Lidar12_pcd_filtered, you need to process the Lidar1_pcd and Lidar2_pcd with `cut_pcd_range->merge_lidar1_and_lidar2->filter_background->clustering_classification_bbox_generation`.
+
+    If you do not have the Lidar12_pcd_filtered, you need to process the Lidar1_pcd and Lidar2_pcd with `cut_pcd_range->merge_lidar1_and_lidar2->filter_background->clustering_classification_bbox_generation`.
 
 ##### Results:
 Detection format (in lidar2 coordinate): frame, subclass, x_center, x_length, y_center, y_length, z_center, z_length, yaw, score
@@ -102,11 +105,11 @@ Steps:
 2. Train model (taking pointpillars as an example)
 ```python tools/train.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py --work-dir work_dirs/xxx --auto-scale-lr```
 
-If you would like to train other models, please edit the class_name and other class-related infos in the config file, refering to the configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py.
+    If you would like to train other models, please edit the class_name and other class-related infos in the config file, refering to the configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py.
 
-For evaluation, please utilize 'kittiMetric' type in val_evaluator.
+    For evaluation, please utilize 'kittiMetric' type in val_evaluator.
 
 3. Test model
 ```python tools/test.py configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_isc-3d-3class.py work_dirs/lidar12/epoch_20_35mAP.pth --work-dir work_dirs/xxx```
 
-epoch_20_35mAP.pth could be used for testing, coco mAP40 and AP11/40(IoU:0.5/0.25) are utilized. 
+    epoch_20_35mAP.pth could be used for testing, coco mAP40 and AP11/40(IoU:0.5/0.25) are utilized. 
