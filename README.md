@@ -12,15 +12,19 @@
 │   └── sample_detections (generated from validation data)
 ├── deep_learning_pipeline
 │   ├── data_processing_for_training
-│   │   ├── 000000.png
-│   │   ├── 000000.txt
-│   │   ├── box_3d_mode.py
-│   │   ├── isc2kitti.py
-│   │   ├── isc_imagesets_generation.py
-│   │   ├── isc_rename_bin_moveto_isc_dataset.py
-│   │   ├── isc_rename_calib.py
-│   │   ├── isc_video_clipping.py
-│   │   └── README.md
+│   │   ├── 000000.png
+│   │   ├── 000000.txt
+│   │   ├── box_3d_mode.py
+│   │   ├── cut_pcd_range.py
+│   │   ├── isc2kitti.py
+│   │   ├── isc_imagesets_generation.py
+│   │   ├── isc_rename_bin_moveto_isc_dataset.py
+│   │   ├── isc_rename_calib.py
+│   │   ├── isc_video_clipping.py
+│   │   ├── main.py
+│   │   ├── merge_lidar1lidar2_cloud.py
+│   │   ├── pcd2bin.py
+│   │   └── README.md
 │   ├── configs
 │   ├── data
 │   ├── mmdet3d
@@ -82,7 +86,7 @@ Under data_processing_for_training folder, find `main.py`.
 ```Command: python main.py <src_path> <target_path>```
 
 Note: Please provide the folder location of source testing data and target testing data with '\\' before blank and '/' in the end.
-I.e., `/home/gene/Documents/Validation\\ Data2/ /home/gene/mmdetection3d/data/isc_full/`
+I.e., `/home/gene/Documents/Validation\ Data2/ /home/gene/mmdetection3d/data/isc_full/`
 
 Steps:
 ```generate kitti label->cut pcd range->merge lidar1 and lidar2->pcd2bin for training in Kitti format->remove data to isc_full->generate imagesets (split train and val randomly)->rename calib files according to imagesets```
