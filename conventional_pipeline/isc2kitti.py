@@ -1,8 +1,8 @@
 from math import pi
 import numpy as np
 # mmdet3d apis
-from mmdet3d.structures import (LiDARInstance3DBoxes,Box3DMode)
-from mmdet3d.structures import limit_period
+from deep_learning_pipeline.mmdet3d.structures import (LiDARInstance3DBoxes,Box3DMode)
+from deep_learning_pipeline.mmdet3d.structures import limit_period
 
 import sys
 import os

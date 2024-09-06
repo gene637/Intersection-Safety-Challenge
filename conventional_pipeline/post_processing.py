@@ -2,25 +2,7 @@
 # How to get results from 2d: 3d point cloud (merged and filtered point cloud) -> project to 2d image -> cluster points -> get centroids -> project to lidar2 coordinates with vehicle/VRU class and confidence
 import numpy as np
 import pandas as pd
-import torch
-
-def limit_period(val,
-                 offset: float = 0.5,
-                 period: float = np.pi):
-    """Limit the value into a period for periodic function.
-
-    Args:
-        val (np.ndarray or Tensor): The value to be converted.
-        offset (float): Offset to set the value range. Defaults to 0.5.
-        period (float): Period of the value. Defaults to np.pi.
-
-    Returns:
-        np.ndarray or Tensor: Value in the range of
-        [-offset * period, (1-offset) * period].
-    """
-    
-    limited_val = val - torch.floor(val / period + offset) * period
-    return limited_val
+import os
 
 def find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size):
     content_value_2d = np.genfromtxt(loc2d, delimiter=',', usecols=range(2,8))
@@ -66,7 +48,7 @@ def find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
                 within_range_indices_3d = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d, search_radius)
                 if len(within_range_indices_3d) == 0:
                     indices_3d2 = np.arange(len(frames_3d))
-                    within_range_indices_3d2 = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d2, search_radius = 30)
+                    within_range_indices_3d2 = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d2, search_radius = 100)
                     print(within_range_indices_3d2)
                     series = pd.Series(classes_3d[within_range_indices_3d2])
                     print(series)
@@ -113,9 +95,6 @@ def calcualte_near_objects(centers_2d, centers_3d, index_2d, indices_3d, search_
     return within_range_indices_3d
 
 def main():
-    # open detections from 2D
-    loc2d = '/home/gene/Downloads/fused_label_lidar12_cam1_5/Run_48/fusion_table/fusion_label/Run_48_fused_result.txt'
-    loc3d = '/home/gene/Documents/Validation Data2/Run_48/detections/Run_48_detections_axis_aligned_lidar2.txt'
 
     name_to_bbox_size = {
         'VRU_Adult_Using_Motorized_Bicycle': [0.96, 1.64, 1.65],
@@ -140,8 +119,23 @@ def main():
     # search radius of object location from 2d
     search_radius = 1.0
 
-    detections = find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
-    print(detections)
+    # open detections from 2D
+    # Get a list of all items in the directory
+    loc = '/home/gene/Documents/Validation Data2/'
+    sub_srcs = os.listdir(loc)
+    # Filter out only directories
+    sub_dirs = [sub_src for sub_src in sub_srcs if os.path.isdir(os.path.join(loc, sub_src))]
+    for sub_dir in sub_dirs:
+        loc2d = '/home/gene/Downloads/fused_label_lidar12_cam1_5/'+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_fused_result.txt'
+        if not os.path.exists(loc2d):
+            continue
+        loc3d = loc+sub_dir+'/detections/'+sub_dir+'_detections_axis_aligned_lidar2.txt'
+        file_name = loc+sub_dir+'/detections/'+sub_dir+'_detections_fusion_lidar12_camera_search-based.txt'
+        detections = find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
+        with open(file_name, "w", encoding="utf-8") as file:
+            for item in detections:
+                file.write(', '.join(map(str, item)) + '\n')
+        # print(detections)
     
 
 
