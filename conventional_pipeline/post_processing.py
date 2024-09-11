@@ -3,8 +3,41 @@
 import numpy as np
 import pandas as pd
 import os
+import csv
+from datetime import datetime
+import pytz
 
-def find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size):
+def cal_timestamp(loc):
+    # Open and read the CSV file
+    with open(loc, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        
+        # Loop through each row in the CSV file
+        for row in reader:
+            if 'Lidar2' in row:
+                start_time = row[4]  # Start time
+
+    # Time string (Eastern Time)
+    time_str = start_time
+
+    # Define the Eastern Time zone
+    eastern = pytz.timezone('America/New_York')
+
+    # Convert the string to a datetime object (local time, without timezone info)
+    dt_local = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+
+    # Localize the datetime object to Eastern Time
+    dt_eastern = eastern.localize(dt_local)
+
+    # Convert Eastern Time to UTC
+    dt_utc = dt_eastern.astimezone(pytz.utc)
+
+    # Convert the UTC datetime object to a Unix timestamp (seconds since epoch)
+    timestamp = dt_utc.timestamp()
+
+    return timestamp
+
+def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, name_to_bbox_size):
     content_value_2d = np.genfromtxt(loc2d, delimiter=',', usecols=range(2,8))
     content_str_2d = np.genfromtxt(loc2d, delimiter=',', dtype='|U', usecols=range(0,2))
     frames_2d = content_str_2d[:,0]
@@ -48,7 +81,7 @@ def find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
                 within_range_indices_3d = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d, search_radius)
                 if len(within_range_indices_3d) == 0:
                     indices_3d2 = np.arange(len(frames_3d))
-                    within_range_indices_3d2 = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d2, search_radius = 100)
+                    within_range_indices_3d2 = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d2, search_radius = 100) #enlarge the search_radius if no matching objects detected
                     print(within_range_indices_3d2)
                     series = pd.Series(classes_3d[within_range_indices_3d2])
                     print(series)
@@ -79,7 +112,8 @@ def find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
                     subclass = most_frequent_class
             size = name_to_bbox_size[subclass]
             center = centers_2d[j]
-            detection = [frames_2d[j], subclass, center[0], size[0], center[1], size[1], center[2], size[2], raws[j]]
+            timestamp = float(timestamp_start) + float(frames_2d[j])*0.1
+            detection = [timestamp, subclass, center[0], size[0], center[1], size[1], center[2], size[2], raws[j]]
             detections.append(detection)
     return detections
 
@@ -121,20 +155,33 @@ def main():
 
     # open detections from 2D
     # Get a list of all items in the directory
-    loc = '/home/gene/Documents/Validation Data2/'
-    sub_srcs = os.listdir(loc)
+    loc = './sample_detections_validation/' #replace it to your own folder
+    res2d_loc = './fused_label_lidar12_cam1_5/' #replace it to your own folder
+    sub_srcs = os.listdir(res2d_loc)
     # Filter out only directories
-    sub_dirs = [sub_src for sub_src in sub_srcs if os.path.isdir(os.path.join(loc, sub_src))]
+    sub_dirs = [sub_src for sub_src in sub_srcs if os.path.isdir(os.path.join(res2d_loc, sub_src))]
     for sub_dir in sub_dirs:
-        loc2d = '/home/gene/Downloads/fused_label_lidar12_cam1_5/'+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_fused_result.txt'
+        #input
+        loc2d = res2d_loc+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_fused_result.txt'
         if not os.path.exists(loc2d):
             continue
-        loc3d = loc+sub_dir+'/detections/'+sub_dir+'_detections_axis_aligned_lidar2.txt'
-        file_name = loc+sub_dir+'/detections/'+sub_dir+'_detections_fusion_lidar12_camera_search-based.txt'
-        detections = find_subclass(loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
-        with open(file_name, "w", encoding="utf-8") as file:
-            for item in detections:
-                file.write(', '.join(map(str, item)) + '\n')
+        loc3d = loc+sub_dir+'_detections_axis_aligned_lidar2.txt'
+        timestamp_loc = '/home/gene/Documents/Validation Data2/'+sub_dir+'/ISC_'+sub_dir+'_ISC_all_timing.csv' #replace it to your own folder with timestamp.csv
+        timestamp_start = cal_timestamp(timestamp_loc)
+
+        #output
+        file_name = res2d_loc+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_detections_fusion_lidar12_camera_search-based.csv'
+        header = ['Timestamps', 'subclass', 'x_center', 'x_length', 'y_center', 'y_length', 'z_center', 'z_length', 'z_rotation']
+        detections = find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
+        # save as CSV
+        with open(file_name, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(header)
+            writer.writerows(detections)
+        # save as txt
+        # with open(file_name, "w", encoding="utf-8") as file:
+        #     for item in detections:
+        #         file.write(', '.join(map(str, item)) + '\n')
         # print(detections)
     
 
