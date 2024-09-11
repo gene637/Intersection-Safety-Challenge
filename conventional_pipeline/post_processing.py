@@ -1,5 +1,6 @@
 # This script is for generating final 3d detections after getting the results from 2D images
 # How to get results from 2d: 3d point cloud (merged and filtered point cloud) -> project to 2d image -> cluster points -> get centroids -> project to lidar2 coordinates with vehicle/VRU class and confidence
+# Please notice: the output of this code is based on 2d detections and calibrated with 3d detections. The ouput.csv may start from frame 000024.
 import numpy as np
 import pandas as pd
 import os
