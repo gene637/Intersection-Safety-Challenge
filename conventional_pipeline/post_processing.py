@@ -7,6 +7,22 @@ import os
 import csv
 from datetime import datetime
 import pytz
+import time
+
+def replace_subclass(subclass_original):
+    # Mapping from groundtruth subclass labels to expected subclass labels
+    if subclass_original == 'VRU_Adult_Using_Manual_Wheelchair' or subclass_original == 'VRU_Adult_Using_Motorized_Wheelchair':
+        subclass_final = 'VRU_Adult_Using_Wheelchair'
+    elif subclass_original == 'VRU_Adult_Using_Manual_Bicycle' or subclass_original == 'VRU_Adult_Using_Motorized_Bicycle':
+        subclass_final = 'VRU_Adult_Using_Bicycle'
+    elif subclass_original == 'VRU_Adult_Using_Cane' or subclass_original == 'VRU_Adult_Using_Stroller' or subclass_original == 'VRU_Adult_Using_Walker' or subclass_original == 'VRU_Adult_Using_Crutches' or subclass_original == 'VRU_Adult_Using_Cardboard_Box' or subclass_original == 'VRU_Adult_Using_Umbrella':
+        subclass_final = 'VRU_Adult_Using_Non-Motorized_Device/Prop_Other'
+    elif subclass_original == 'VRU_Adult_Using_Electric_Scooter' or subclass_original == 'VRU_Adult_Using_Manual_Scooter' or subclass_original == 'VRU_Adult_Using_Skateboard':
+        subclass_final = 'VRU_Adult_Using_Scooter_or_Skateboard'
+    else:
+        subclass_final = subclass_original
+    
+    return subclass_final
 
 def cal_timestamp(loc):
     # Open and read the CSV file
@@ -38,8 +54,23 @@ def cal_timestamp(loc):
 
     return timestamp
 
+def filter_redundencies(indices_2d, centers_2d, classes_2d):
+    indices_2d_updated = indices_2d
+    for j in indices_2d:
+        for jj in indices_2d:
+            if jj == j:
+                continue
+            elif np.linalg.norm(centers_2d[j] - centers_2d[jj]) < 0.1:
+                if classes_2d[j] == 'bicycle' and classes_2d[jj] == 'person':
+                    indices_2d_updated = np.delete(indices_2d_updated, np.where(indices_2d_updated == jj)[0])
+                elif classes_2d[j] == 'car' and classes_2d[jj] == 'truck':
+                    indices_2d_updated = np.delete(indices_2d_updated, np.where(indices_2d_updated == jj)[0])
+                elif classes_2d[j] == 'car' and classes_2d[jj] == 'car':
+                    indices_2d_updated = np.delete(indices_2d_updated, np.where(indices_2d_updated == jj)[0])
+    return indices_2d_updated
+
 def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, name_to_bbox_size):
-    content_value_2d = np.genfromtxt(loc2d, delimiter=',', usecols=range(2,8))
+    content_value_2d = np.genfromtxt(loc2d, delimiter=',', usecols=range(2,7))
     content_str_2d = np.genfromtxt(loc2d, delimiter=',', dtype='|U', usecols=range(0,2))
     frames_2d = content_str_2d[:,0]
     frames_2d = np.char.replace(frames_2d, '.pid', '')
@@ -47,7 +78,7 @@ def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, n
     classes_2d = np.char.replace(classes_2d, ' ', '')
     centers_2d = content_value_2d[:,0:3]
     confidence_scores = content_value_2d[:,3]
-    raws = content_value_2d[:,5]
+    raws = content_value_2d[:,4]
 
     content_value_3d = np.genfromtxt(loc3d, delimiter=',', usecols=range(2,10))
     content_str_3d = np.genfromtxt(loc3d, delimiter=',', dtype='|U', usecols=range(0,2))
@@ -60,7 +91,7 @@ def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, n
     detections = []
 
     for i in range(int(frames_2d[0]), int(frames_2d[-1])+1):
-        print(i)
+        # print(i)
         if i>=int(frames_2d[0])+search_period and i<=int(frames_2d[-1])+1-search_period:
             indices_2d = np.where(frames_2d == str(i).zfill(6))[0]
             indices_3d = np.array([])
@@ -72,9 +103,11 @@ def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, n
             frame = str(i).zfill(6)
             indices_2d = np.where(frames_2d == frame)[0]
             indices_3d = np.where(frames_3d == frame)[0]
-        for j in indices_2d:
-            # print(classes_2d[j])
-            if classes_2d[j] == 'car' or classes_2d[j] == 'truck':
+        # filter the redundencies
+        indices_2d_updated = filter_redundencies(indices_2d, centers_2d, classes_2d)
+        # find subclass in 3d
+        for j in indices_2d_updated:
+            if classes_2d[j] == 'car' or classes_2d[j] == 'truck' or classes_2d[j] == 'bus':
                 subclass = 'Passenger_Vehicle'
             elif classes_2d[j] == 'bicycle':
                 subclass = 'VRU_Adult_Using_Manual_Bicycle'
@@ -83,15 +116,15 @@ def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, n
                 if len(within_range_indices_3d) == 0:
                     indices_3d2 = np.arange(len(frames_3d))
                     within_range_indices_3d2 = calcualte_near_objects(centers_2d, centers_3d, j, indices_3d2, search_radius = 100) #enlarge the search_radius if no matching objects detected
-                    print(within_range_indices_3d2)
                     series = pd.Series(classes_3d[within_range_indices_3d2])
-                    print(series)
                     frequency = series.value_counts()
-                    print(frequency)
                     tmp = 0
-                    while frequency.index[tmp] == 'VRU_Adult_Using_Manual_Bicycle' or frequency.index[tmp] == 'Passenger_Vehicle':
+                    while frequency.index[tmp] == 'VRU_Adult_Using_Manual_Bicycle' or frequency.index[tmp] == 'VRU_Adult_Using_Motorized_Bicycle' or frequency.index[tmp] == 'Passenger_Vehicle':
                         tmp += 1
                     subclass = frequency.index[tmp]
+                    # print('theres nothing within range')
+                    # print(subclass)
+                    # time.sleep(2)
                 else:
                     # filter the most frequent one
                     # print(within_range_indices_3d)
@@ -108,13 +141,17 @@ def find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, n
                         most_frequent_class = most_frequent_classes[0]
                     # if class is bicycle or vehicle
                     if len(frequency) > 1:
-                        if most_frequent_class=='VRU_Adult_Using_Manual_Bicycle' or most_frequent_class=='Passenger_Vehicle':
+                        if most_frequent_class == 'VRU_Adult_Using_Manual_Bicycle' or most_frequent_class == 'VRU_Adult_Using_Motorized_Bicycle' or most_frequent_class == 'Passenger_Vehicle':
                             most_frequent_class = frequency.index[1]
                     subclass = most_frequent_class
+                    # print('theres something within range')
+                    # print(most_frequent_class)
+                    # time.sleep(2)
             size = name_to_bbox_size[subclass]
             center = centers_2d[j]
             timestamp = float(timestamp_start) + float(frames_2d[j])*0.1
-            detection = [timestamp, subclass, center[0], size[0], center[1], size[1], center[2], size[2], raws[j]]
+            subclass_final = replace_subclass(subclass)
+            detection = [timestamp, subclass_final, center[0], size[0], center[1], size[1], center[2], size[2], raws[j]]
             detections.append(detection)
     return detections
 
@@ -157,13 +194,16 @@ def main():
     # open detections from 2D
     # Get a list of all items in the directory
     loc = './sample_detections_validation/' #replace it to your own folder
-    res2d_loc = './fused_label_lidar12_cam1_5/' #replace it to your own folder
+    res2d_loc = './masked_fusion_label_coco/' #replace it to your own folder
     sub_srcs = os.listdir(res2d_loc)
-    # Filter out only directories
-    sub_dirs = [sub_src for sub_src in sub_srcs if os.path.isdir(os.path.join(res2d_loc, sub_src))]
-    for sub_dir in sub_dirs:
+    # Filter out .txt files
+    txt_files = [file for file in sub_srcs if file.endswith('.txt')]
+    
+    for sub_txt in txt_files:
+        sub_dir = sub_txt[:-17]
+        print(sub_dir)
         #input
-        loc2d = res2d_loc+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_fused_result.txt'
+        loc2d = res2d_loc+sub_txt
         if not os.path.exists(loc2d):
             continue
         loc3d = loc+sub_dir+'_detections_axis_aligned_lidar2.txt'
@@ -171,7 +211,7 @@ def main():
         timestamp_start = cal_timestamp(timestamp_loc)
 
         #output
-        file_name = res2d_loc+sub_dir+'/fusion_table/fusion_label/'+sub_dir+'_detections_fusion_lidar12_camera_search-based.csv'
+        file_name = res2d_loc+sub_dir+'_detections_fusion_lidar12_camera_search-based.csv'
         header = ['Timestamps', 'subclass', 'x_center', 'x_length', 'y_center', 'y_length', 'z_center', 'z_length', 'z_rotation']
         detections = find_subclass(timestamp_start, loc2d, loc3d, search_period, search_radius, name_to_bbox_size)
         # save as CSV
