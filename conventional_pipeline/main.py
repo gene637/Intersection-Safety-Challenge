@@ -20,16 +20,16 @@ def main():
     # isc2kitti(loc) #annotate this line if you have generated kittiGT in the deep learning pipeline, this kitti label is used for training the classifier
 
     # cut pcd range
-    # cut_pcd_range(loc, 'Lidar1') #annotate this line if you have gotten the range cut pcds
-    # cut_pcd_range(loc, 'Lidar2') 
+    cut_pcd_range(loc, 'Lidar1') #annotate this line if you have gotten the range cut pcds
+    cut_pcd_range(loc, 'Lidar2') 
 
     # merge lidar1 and lidar2
-    # merge_lidar1lidar2_cloud(loc) #annotate this line if you have merged the range cut pcds
+    merge_lidar1lidar2_cloud(loc) #annotate this line if you have merged the range cut pcds
 
     # filter the background
     # filter outlier paras: scale, bigger->filter more
     # remove outlier based on radius: nb_points, radius, at least nb_points in radius
-    # dataset_background_filter(loc, scale=4, nb_points=4, radius=2) #annotate this line if you have filtered the background
+    dataset_background_filter(loc, scale=4, nb_points=4, radius=2) #annotate this line if you have filtered the background
 
     # get the training feature and label
     # clustering_labelfeature_extractor(loc) #annotate this line if you have gotten the label_features (label_features_12_all) 

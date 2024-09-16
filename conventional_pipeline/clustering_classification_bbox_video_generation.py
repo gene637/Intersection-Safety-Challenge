@@ -160,18 +160,46 @@ def get_sorted_files(directory):
     
     return sorted_files
 
+def limit_period(val,
+                 offset: float = 0,
+                 period: float = 2*np.pi):
+    """Limit the value into a period for periodic function.
+
+    Args:
+        val (np.ndarray or Tensor): The value to be converted.
+        offset (float): Offset to set the value range. Defaults to 0.5.
+        period (float): Period of the value. Defaults to np.pi.
+
+    Returns:
+        np.ndarray or Tensor: Value in the range of
+        [-offset * period, (1-offset) * period].
+    """
+    
+    limited_val = val - np.floor(val / period + offset) * period
+    limited_val = math.degrees(limited_val)
+    return limited_val
+
 def bbox_generation(bbox_axis_aligned, bbox_oriented, sub_item, name):
+
+    R_velo_to_label = np.array([[0,1,0],
+                                [-1,0,0],
+                                [0,0,1]])
+
     #bbox structure: frame, subclass, x_center, x_length, y_center, y_length, z_center, z_length, yaw, score(calculated with distance to the 2D detected location)
     extent_axis_aligned = bbox_axis_aligned.get_extent()
     center_axis_aligned = bbox_axis_aligned.get_center()
+    center_axis_aligned = R_velo_to_label@center_axis_aligned
     bbox_axis_aligned_lidar2 = [sub_item,name,center_axis_aligned[0],extent_axis_aligned[0],center_axis_aligned[1],extent_axis_aligned[1],center_axis_aligned[2],extent_axis_aligned[2],0,0]
     # bbox_axis_aligned_kitti = [sub_item, labelgt, 0, 0, 0, 0, 0, height, ]
 
     extent_oriented = bbox_oriented.extent
     center_oriented = bbox_oriented.center
+    center_oriented = R_velo_to_label@center_oriented
     rotation_oriented = bbox_oriented.R
-    yaw = math.atan2(rotation_oriented[1, 0], rotation_oriented[0, 0])
-    bbox_oriented_lidar2 = [sub_item,name,center_oriented[0],extent_oriented[0],center_oriented[1],extent_oriented[1],center_oriented[2],extent_oriented[2],yaw,0]
+    raw = math.atan2(rotation_oriented[1, 0], rotation_oriented[0, 0])-np.pi/2
+    raw = limit_period(raw, 0, np.pi*2)
+    # raw = math.degrees(raw)
+    bbox_oriented_lidar2 = [sub_item,name,center_oriented[0],extent_oriented[0],center_oriented[1],extent_oriented[1],center_oriented[2],extent_oriented[2],raw,0]
 
     return bbox_axis_aligned_lidar2, bbox_oriented_lidar2 
 

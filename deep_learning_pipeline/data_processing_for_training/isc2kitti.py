@@ -43,6 +43,16 @@ def main(loc):
                 #center z->bottom z
                 bbxs_7[j,2] = bbxs_7[j,2]-bbxs_7[j,5]/2
                 #raw: lidar->camera (kitti)
+
+                # Coordinates in GT label:
+                #             up z
+                #                ^
+                #                |
+                #                |
+                # left x <------ 0
+                #               /
+                #              /
+                #             y back
                 
                 # Coordinates in LiDAR:
                 #             up z
